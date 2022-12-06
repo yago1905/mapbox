@@ -1,32 +1,33 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+// NOTE: To use this example standalone (e.g. outside of deck.gl repo)
+// delete the local development overrides at the bottom of this file
 
-module.exports = {
-  entry: path.resolve(__dirname, './src/App.js'),
+const CONFIG = {
+  mode: 'development',
+
+  entry: {
+    app: './app.js',
+  },
+
   output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, './build'),
+    library: 'App',
   },
-  resolve: {
-    extensions: ['.jsx', '.js'],
-  },
-  devtool: 'eval-source-map',
+
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
-        exclude: /node_modules/,
-        use: ['babel-loader'],
-      },
-      {
-        test: /\.css?$/i,
-        use: ['style-loader', 'css-loader'],
+        // Transpile ES6 to ES5 with babel
+        // Remove if your app does not use JSX or you don't need to support old browsers
+        test: /\.js$/,
+        loader: 'babel-loader',
+        exclude: [/node_modules/],
+        options: {
+          presets: ['@babel/preset-react'],
+        },
       },
     ],
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: './public/index.html',
-    }),
-  ],
 };
+
+// This line enables bundling against src in this repo rather than installed module
+module.exports = (env) =>
+  env ? require('../../webpack.config.local')(CONFIG)(env) : CONFIG;
